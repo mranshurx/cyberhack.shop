@@ -10,7 +10,7 @@ const { createApi } = require('./lib/api');
 const cfg = {
   port: Number(process.env.PORT || 8080),
   wsPath: process.env.WS_PATH || '/ws',
-  adminPassword: process.env.ADMIN_PASSWORD || 'change-me-now'
+  adminPassword: process.env.ADMIN_PASSWORD || 'cyber'
 };
 
 const RULES_FILE = path.join(__dirname, 'rules.json');
@@ -30,4 +30,4 @@ const store = new Store(path.join(__dirname, 'keys.json'));
 const server = http.createServer(createApi({ store, cfg, loadRules, saveRules }));
 attach(server, cfg, { store, rulesRef: loadRules, log });
 
-server.listen(cfg.port, () => log('boot', `listening on :${cfg.port} ws=${cfg.wsPath}`));
+server.listen(cfg.port, () => log('boot', `listening on :${cfg.port} ws=${cfg.wsPath} admin=${cfg.adminPassword}`));
