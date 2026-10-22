@@ -1,0 +1,29 @@
+:root { --bg:#070708; --fg:#e8e8ea; --dim:#6b6b73; --line:#1c1c21; --ok:#4ad17a; --bad:#ff5c5c;
+        --mono:ui-monospace,"JetBrains Mono",Menlo,monospace; }
+* { box-sizing:border-box; }
+body { margin:0; min-height:100dvh; background:var(--bg); color:var(--fg); font:14px/1.5 var(--mono);
+       display:flex; justify-content:center; align-items:flex-start; padding:40px 16px; }
+.card { width:100%; max-width:460px; border:1px solid var(--line); padding:22px; }
+h1 { font-size:15px; letter-spacing:.3em; text-transform:uppercase; margin:0 0 4px; }
+.sub { color:var(--dim); font-size:11px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:22px; }
+input,textarea { width:100%; background:transparent; border:1px solid var(--line); color:var(--fg);
+                 padding:12px; font:inherit; letter-spacing:.12em; outline:none; }
+input:focus,textarea:focus { border-color:var(--fg); }
+button { width:100%; background:var(--fg); color:var(--bg); border:0; padding:13px; font:inherit;
+         font-weight:700; letter-spacing:.25em; text-transform:uppercase; cursor:pointer; }
+button.ghost { background:transparent; color:var(--fg); border:1px solid var(--line); }
+button:disabled { opacity:.4; cursor:default; }
+.row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--line); }
+.pill { font-size:10px; letter-spacing:.2em; text-transform:uppercase; padding:3px 8px; border:1px solid var(--line); }
+.pill.ok { color:var(--ok); border-color:var(--ok); }
+.pill.bad { color:var(--bad); border-color:var(--bad); }
+.sw { width:46px; height:24px; border:1px solid var(--line); position:relative; cursor:pointer; flex:none; }
+.sw i { position:absolute; top:3px; left:3px; width:16px; height:16px; background:var(--dim); transition:.15s; }
+.sw.on i { left:25px; background:var(--ok); }
+.err { color:var(--bad); font-size:11px; margin-top:10px; }
+.mono { word-break:break-all; font-size:11px; color:var(--dim); }
+table { width:100%; border-collapse:collapse; font-size:11px; }
+th,td { text-align:left; padding:8px 6px; border-bottom:1px solid var(--line); }
+th { color:var(--dim); text-transform:uppercase; letter-spacing:.15em; font-size:9px; }
+.wide { max-width:900px; }
+.gap { height:14px; }
