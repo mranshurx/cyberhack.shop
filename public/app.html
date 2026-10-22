@@ -1,0 +1,55 @@
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PHANTOM</title><link rel="stylesheet" href="/style.css"></head>
+<body><div class="card">
+  <h1>PHANTOM</h1><div class="sub">dashboard</div>
+  <div class="row"><span>status</span><span class="pill" id="st">…</span></div>
+  <div class="row"><span>time left</span><span id="tt">—</span></div>
+  <div class="gap"></div>
+  <div class="sub">features</div><div id="feats"></div>
+  <div class="gap"></div><button id="conn">get config</button>
+  <div class="gap"></div><div class="mono" id="out"></div>
+  <div class="gap"></div><button class="ghost" id="copy" style="display:none">copy link</button>
+  <div class="gap"></div><button class="ghost" id="lo">log out</button>
+</div>
+<script>
+let me, link = '';
+const NAMES = { headshot:'headshot', moco:'moco', hitdup:'hit duplicate' };
+
+async function load() {
+  const r = await fetch('/api/me');
+  if (r.status === 401) return location.href = '/';
+  me = await r.json();
+  st.textContent = me.status;
+  st.className = 'pill ' + (me.status === 'active' ? 'ok' : 'bad');
+  feats.innerHTML = Object.keys(me.features).map(id =>
+    `<div class="row"><span>${NAMES[id] || id}</span><div class="sw ${me.features[id] ? 'on' : ''}" data-id="${id}"><i></i></div></div>`
+  ).join('');
+  document.querySelectorAll('.sw').forEach(el => el.onclick = async () => {
+    el.classList.toggle('on');
+    await fetch('/api/features', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ features: Object.fromEntries(
+        [...document.querySelectorAll('.sw')].map(s => [s.dataset.id, s.classList.contains('on')])) }) });
+  });
+  tick();
+}
+function tick() {
+  const l = me.expires_at - Date.now();
+  tt.textContent = l <= 0 ? 'expired'
+    : `${Math.floor(l/864e5)}d ${Math.floor(l%864e5/36e5)}h ${Math.floor(l%36e5/6e4)}m`;
+  setTimeout(tick, 1000);
+}
+conn.onclick = async () => {
+  conn.disabled = true;
+  const d = await (await fetch('/api/link')).json();
+  conn.disabled = false;
+  if (!d.ok) return out.textContent = d.error || 'failed';
+  link = d.vless;
+  out.innerHTML = `paste into v2rayNG / Happ:<br><br>${d.vless}<br><br>
+    <a href="${d.happ}" style="color:#e8e8ea">or tap to open Happ</a>`;
+  copy.style.display = 'block';
+};
+copy.onclick = () => { navigator.clipboard.writeText(link); copy.textContent = 'copied'; };
+lo.onclick = async () => { await fetch('/api/logout', { method:'POST' }); location.href = '/'; };
+load();
+</script></body></html>
