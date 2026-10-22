@@ -1,0 +1,28 @@
+{
+  "features": [
+    {
+      "id": "headshot",
+      "name": "Headshot",
+      "desc": "Raises the enemy anchor so aim assist snaps to the neck.",
+      "dir": "s2c",
+      "match": { "len": [100, 900], "bytes": { "2": "3a", "3": "38" } },
+      "patch": [{ "off": 40, "add": 16 }]
+    },
+    {
+      "id": "moco",
+      "name": "Moco",
+      "desc": "Marker / location frames.",
+      "dir": "s2c",
+      "match": { "len": [42, 42], "bytes": { "10": "02" } },
+      "patch": []
+    },
+    {
+      "id": "hitdup",
+      "name": "Hit duplicate",
+      "desc": "Sends your hit packet twice.",
+      "dir": "c2s",
+      "match": { "len": [57, 61], "bytes": { "4": "eb" } },
+      "repeat": 2
+    }
+  ]
+}
