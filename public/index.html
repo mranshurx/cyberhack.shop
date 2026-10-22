@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PHANTOM</title><link rel="stylesheet" href="/style.css"></head>
+<body><div class="card">
+  <h1>PHANTOM</h1>
+  <div class="sub">no account. no password. just your key.</div>
+  <input id="key" placeholder="PHTM-XXXX-XXXX-XXXX" autocapitalize="characters" spellcheck="false" autofocus>
+  <div class="gap"></div><button id="go">unlock</button>
+  <div class="err" id="err"></div>
+</div>
+<script>
+const fmt = s => (s.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,16).match(/.{1,4}/g) || []).join('-');
+key.oninput = e => e.target.value = fmt(e.target.value);
+async function go() {
+  err.textContent = '';
+  const r = await fetch('/api/redeem', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ key: key.value }) });
+  const d = await r.json();
+  if (!r.ok) return err.textContent = d.error || 'failed';
+  location.href = '/app';
+}
+go.onclick = go; key.onkeydown = e => e.key === 'Enter' && go();
+</script></body></html>
