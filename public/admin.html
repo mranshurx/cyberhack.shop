@@ -1,0 +1,70 @@
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PHANTOM // admin</title><link rel="stylesheet" href="/style.css"></head>
+<body><div class="card wide">
+  <h1>PHANTOM // admin</h1><div class="sub" id="sub">authenticate</div>
+  <div id="login">
+    <input id="pw" type="password" placeholder="admin password">
+    <div class="gap"></div><button id="go">enter</button>
+    <div class="err" id="err"></div>
+  </div>
+  <div id="panel" style="display:none">
+    <div class="row"><span>new key</span><span>
+      <input id="days" type="number" value="1" style="width:70px;display:inline-block">
+      <button id="mk" style="width:auto;padding:8px 14px">create</button></span></div>
+    <div class="gap"></div>
+    <table><thead><tr><th>key</th><th>status</th><th>expires</th><th>online</th><th></th></tr></thead>
+    <tbody id="rows"></tbody></table>
+    <div class="gap"></div><div class="sub">rules.json (live)</div>
+    <textarea id="rules" rows="18" spellcheck="false"></textarea>
+    <div class="gap"></div><button id="save">save rules</button>
+    <div class="gap"></div><button class="ghost" id="lo">log out</button>
+  </div>
+</div>
+<script>
+const J = (u, o) => fetch(u, o).then(async r => ({ ok: r.ok, d: await r.json().catch(() => ({})) }));
+
+async function boot() {
+  const r = await J('/api/admin/keys');
+  if (!r.ok) return;
+  login.style.display = 'none'; panel.style.display = 'block'; sub.textContent = 'admin';
+  const on = new Set(r.d.online);
+  rows.innerHTML = '';
+  r.d.keys.forEach(k => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${k.key}</td><td>${k.status}</td>
+      <td>${new Date(k.expires_at).toLocaleDateString()}</td><td>${on.has(k.key) ? '●' : ''}</td><td></td>`;
+    const td = tr.lastElementChild;
+    const mk = (l, fn) => {
+      const b = document.createElement('button');
+      b.textContent = l; b.style.cssText = 'width:auto;padding:4px 8px;margin-left:4px';
+      b.onclick = async () => { await fn(); boot(); };
+      td.appendChild(b);
+    };
+    const P = body => J('/api/admin/keys/' + k.key, { method:'PATCH',
+      headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    mk(k.status === 'active' ? 'pause' : 'activate', () => P({ status: k.status === 'active' ? 'paused' : 'active' }));
+    mk('+1d', () => P({ days: 1 }));
+    mk('del', () => J('/api/admin/keys/' + k.key, { method:'DELETE' }));
+    rows.appendChild(tr);
+  });
+  const rr = await J('/api/admin/rules');
+  if (rr.ok) rules.value = JSON.stringify(rr.d.rules, null, 2);
+}
+
+go.onclick = async () => {
+  const r = await J('/api/admin/login', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ password: pw.value }) });
+  if (!r.ok) return err.textContent = 'bad password';
+  boot();
+};
+mk.onclick = async () => { await J('/api/admin/keys', { method:'POST',
+  headers:{'Content-Type':'application/json'}, body: JSON.stringify({ days: +days.value || 1 }) }); boot(); };
+save.onclick = async () => {
+  let r; try { r = JSON.parse(rules.value); } catch { return alert('invalid json'); }
+  await J('/api/admin/rules', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ rules: r }) });
+  alert('saved');
+};
+lo.onclick = async () => { await J('/api/admin/logout', { method:'POST' }); location.reload(); };
+boot();
+</script></body></html>
