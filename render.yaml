@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: phantom
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: WS_PATH
+        value: /ws
